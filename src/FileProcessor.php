@@ -23,15 +23,22 @@ class FileProcessor
             // TODO validate batch
 
             // sort validated batch
-            sort($batch);
+            ksort($batch);
 
             // save sorted batch to temp file
             $temporaryFilename = tempnam(sys_get_temp_dir(), 'sorted_batch_');
-            file_put_contents($temporaryFilename, $batch);
+
+            foreach ($batch as $batchLine) {
+                file_put_contents($temporaryFilename, $batchLine['comments'], FILE_APPEND);
+                file_put_contents($temporaryFilename, $batchLine['value'], FILE_APPEND);
+            }
+
             $temporaryFiles[] = $temporaryFilename;
 
             echo PHP_EOL;
         }
+
+        fclose($this->file);
 
         return $temporaryFiles;
     }
@@ -39,9 +46,19 @@ class FileProcessor
     private function extractBatch(): array
     {
         $batch = [];
+        $comments = [];
 
         while (count($batch) < self::BATCH_SIZE && ($line = fgets($this->file)) !== false) {
-            $batch[] = $line;
+            if (str_starts_with($line, '#')) {
+                $comments[] = $line;
+                continue;
+            }
+
+            // TODO: validate
+
+            list($key, $value) = explode('=', $line, 2);
+            $batch[$key] = ['value' => $line, 'comments' => $comments];
+            $comments = [];
         }
 
         return $batch;
