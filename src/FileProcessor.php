@@ -34,8 +34,6 @@ class FileProcessor
             }
 
             $temporaryFiles[] = $temporaryFilename;
-
-            echo PHP_EOL;
         }
 
         fclose($this->file);

@@ -1,6 +1,7 @@
 <?php
 
 use TranslationSort\FileProcessor;
+use TranslationSort\Sorter;
 
 require_once 'vendor/autoload.php';
 
@@ -11,9 +12,10 @@ try {
 
     $tempFiles = $fileProcessor->execute();
 
-    foreach ($tempFiles as $tempFile) {
-       echo $tempFile . PHP_EOL;
-    }
+    $sorter = new Sorter();
+    $sorter->mergeSortedFiles($tempFiles);
+
+    //TODO remove temporary files
 
 } catch (Exception $exception) {
     echo "Error: " . $exception->getMessage();
